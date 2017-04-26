@@ -1,7 +1,7 @@
 # coding=utf8
 #import codecs
 
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 import feedparser
 
 app = Flask(__name__)
@@ -17,11 +17,14 @@ URLs = {
 
 @app.route("/")
 @app.route("/<publication>")
-def get_news(publication="bbc"):	
+def get_news():
+	query = request.args.get("publication")
+	if not query or query.lower() not in URLs.keys():
+		publication = 'bbc'
+	else:
+		publication = query.lower()
 	feed = feedparser.parse(URLs[publication])
-	#first_article = feed["entries"][0]
-	#return render_template("home.html", article=first_article)
-	return render_template("home.html", articles=feed["entries"])
+	return render_template("home.html", articles = feed["entries"])
 
 
 if __name__ == "__main__":
